@@ -679,6 +679,28 @@ class Response
         return $this;
     }
 
+
+    public function setStaleIfError($value)
+    {
+        $this->headers->addCacheControlDirective('stale-if-error', $value);
+    }
+
+    public function getStaleIfError()
+    {
+        $this->headers->getCacheControlDirective('stale-if-error');
+    }
+
+    public function setStaleWhileRevalidate($value)
+    {
+        $this->headers->addCacheControlDirective('stale-while-revalidate', $value);
+    }
+
+    public function getStaleWhileRevalidate($value)
+    {
+        $this->headers->getCacheControlDirective('stale-while-revalidate');
+    }
+
+
     /**
      * Sets the number of seconds after which the response should no longer be considered fresh by shared caches.
      *
@@ -831,7 +853,7 @@ class Response
     /**
      * Sets the response's cache headers (validation and/or expiration).
      *
-     * Available options are: etag, last_modified, max_age, s_maxage, private, and public.
+     * Available options are: etag, last_modified, max_age, s_maxage, private, public, stale-while-revalidate and stale-if-error.
      *
      * @param array $options An array of cache options
      *
@@ -841,7 +863,7 @@ class Response
      */
     public function setCache(array $options)
     {
-        if ($diff = array_diff(array_keys($options), array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public'))) {
+        if ($diff = array_diff(array_keys($options), array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public', 'stale-while-revalidate', 'stale-if-error'))) {
             throw new \InvalidArgumentException(sprintf('Response does not support the following options: "%s".', implode('", "', array_values($diff))));
         }
 
@@ -875,6 +897,14 @@ class Response
             } else {
                 $this->setPublic();
             }
+        }
+
+        if (isset($options['stale-while-revalidate'])) {
+            $this->setStaleWhileRevalidate($options['stale-while-revalidate']);
+        }
+
+        if (isset($options['stale-if-error'])) {
+            $this->setStaleIfError($options['stale-if-error']);
         }
 
         return $this;
